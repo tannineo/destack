@@ -15,12 +15,17 @@ describe('Load editor', () => {
     await copyTemplateToTemp()
     await execAsyncUntil('npm run dev', {}, 'compiled successfully')
     await page.setViewport({ width: 800, height: 600 })
-    await page.goto('http://localhost:3000', { waitUntil: 'load' })
   })
   it('should contain a "gjs" element', async () => {
+    await page.goto('http://localhost:3000', { waitUntil: 'load' })
+    await expect(page.$('#gjs')).resolves.not.toBeNull()
+
+    await page.goto('http://localhost:3000/builder', { waitUntil: 'load' })
     await expect(page.$('#gjs')).resolves.not.toBeNull()
   })
   it('should add block to canvas', async () => {
+    await page.goto('http://localhost:3000', { waitUntil: 'load' })
+
     // await logMouseEvents(page)
 
     await page.waitForSelector('#gjs')

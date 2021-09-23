@@ -1,4 +1,4 @@
-# Destack 🔌 Own your stack. Embrace your design.
+# This is a PERSONAL fork of Destack
 
 Build landing pages visually right in your Next.js project. Deploy them zero further configuration!
 

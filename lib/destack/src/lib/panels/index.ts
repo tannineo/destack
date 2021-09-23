@@ -123,13 +123,42 @@ export const loadPanels = (editor, isDev) => {
   // Config Buttons
   editor.Panels.removeButton('options', 'export-template')
   editor.Panels.getButton('options', 'sw-visibility').set('active', false)
-  if (!isDev)
-    editor.Panels.addButton('options', {
-      id: 'export-template',
-      className: 'fa fa-code',
-      command: (e) => e.runCommand('export-template'),
-      attributes: { title: 'View Code' },
-    })
+  editor.Panels.addButton('options', {
+    id: 'export-template',
+    className: 'fa fa-code',
+    command: (e) => e.runCommand('export-template'),
+    attributes: { title: 'View Code' },
+  })
+  editor.Panels.addButton('options', {
+    id: 'download-html',
+    className: 'fa fa-download',
+    command: (e) => {
+      let textTitle = prompt('Please enter the title:', 'Fancy Title')
+      if (textTitle == null || textTitle == '') {
+        // do nothing
+      } else {
+        let textHtml = `<html>
+  <head>
+    <title>${textTitle}</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.1.4/dist/tailwind.min.css" />
+    <style>
+      ${e.CssComposer.store().css}
+    </style>
+  </head>
+  <body>
+    ${e.getHtml()}
+  </body>`
+        console.log(textHtml)
+        let ele = document.createElement('a')
+        ele.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textHtml))
+        ele.setAttribute('download', 'exported.html')
+        document.body.appendChild(ele)
+        ele.click()
+        document.body.removeChild(ele)
+      }
+    },
+    attributes: { title: 'Download HTML' },
+  })
   editor.Panels.addButton('options', {
     id: 'undo',
     className: 'fa fa-undo',

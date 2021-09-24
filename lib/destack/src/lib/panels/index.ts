@@ -1,3 +1,7 @@
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget
+}
+
 const txtConfirm = "Are you sure you want to clear the editor? This can't be undone."
 
 const themeList = [
@@ -70,7 +74,7 @@ const getAllComponents = (model: any, result = [] as any[]) => {
   return result
 }
 
-const updateThemeColor = (editor, color) => {
+const updateThemeColor = (editor, color): void => {
   const wrapper = editor.DomComponents.getWrapper()
   const componentsAll = getAllComponents(wrapper, [])
   componentsAll.forEach((c) => {
@@ -85,7 +89,8 @@ const updateThemeColor = (editor, color) => {
   })
 }
 
-export const loadPanels = (editor, isDev) => {
+// export const loadPanels = (editor, isDev: boolean): void => {
+export const loadPanels = (editor): void => {
   // Show Style Manager
   editor.on('component:selected', () => {
     const openSmBtn = editor.Panels.getButton('views', 'open-sm')
@@ -131,13 +136,14 @@ export const loadPanels = (editor, isDev) => {
   })
   editor.Panels.addButton('options', {
     id: 'download-html',
-    className: 'fa fa-download',
+    className: 'fa fa-html5',
+    attributes: { title: 'Download HTML' },
     command: (e) => {
-      let textTitle = prompt('Please enter the title:', 'Fancy Title')
+      const textTitle = prompt('Please enter the title:', 'Fancy Title')
       if (textTitle == null || textTitle == '') {
         // do nothing
       } else {
-        let textHtml = `<html>
+        const textHtml = `<html>
   <head>
     <title>${textTitle}</title>
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.1.4/dist/tailwind.min.css" />
@@ -149,7 +155,7 @@ export const loadPanels = (editor, isDev) => {
     ${e.getHtml()}
   </body>`
         console.log(textHtml)
-        let ele = document.createElement('a')
+        const ele = document.createElement('a')
         ele.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textHtml))
         ele.setAttribute('download', 'exported.html')
         document.body.appendChild(ele)
@@ -157,8 +163,60 @@ export const loadPanels = (editor, isDev) => {
         document.body.removeChild(ele)
       }
     },
-    attributes: { title: 'Download HTML' },
   })
+  editor.Panels.addButton('options', {
+    id: 'download-json',
+    className: 'fa fa-download',
+    attributes: { title: 'Save as JSON' },
+    command: (e) => {
+      const ele = document.createElement('a')
+      ele.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(e.store())),
+      )
+      ele.setAttribute('style', 'display: none;')
+      ele.setAttribute('download', 'exported.json')
+      document.body.appendChild(ele)
+      ele.click()
+      document.body.removeChild(ele)
+    },
+  })
+  editor.Panels.addButton('options', {
+    id: 'upload-json',
+    className: 'fa fa-upload',
+    attributes: { title: 'Upload JSON' },
+    command: (editor) => {
+      const ele = document.createElement('input')
+      ele.setAttribute('type', 'file')
+      ele.setAttribute('style', 'display: none;')
+
+      ele.addEventListener(
+        'change',
+        (event: HTMLInputEvent) => {
+          if (!event.target.files) {
+            alert("This browser doesn't seem to support the `files` property of file inputs.")
+          } else if (!event.target.files[0]) {
+            alert("Please select a file before clicking 'Load'")
+          } else {
+            const jsonFile = event.target.files[0]
+            const fr = new FileReader()
+            fr.onload = (event2) => {
+              const jsonData = JSON.parse(event2.target?.result as string)
+              console.log(jsonData)
+              editor.setComponents(JSON.parse(jsonData.components))
+              editor.setStyle(JSON.parse(jsonData.styles))
+              document.body.removeChild(ele)
+            }
+            fr.readAsText(jsonFile)
+          }
+        },
+        false,
+      )
+      document.body.appendChild(ele)
+      ele.click()
+    },
+  })
+
   editor.Panels.addButton('options', {
     id: 'undo',
     className: 'fa fa-undo',

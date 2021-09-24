@@ -1,4 +1,4 @@
-# This is a PERSONAL fork of Destack
+# This is a PERSONAL fork of Destack 0.10.4
 
 Build landing pages visually right in your Next.js project. Deploy them zero further configuration!
 

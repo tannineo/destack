@@ -1,6 +1,6 @@
 require('./styles/index.module.css')
-export { getStaticProps } from 'destack/build/server'
-import { ContentProvider } from 'destack'
+export { getStaticProps } from '@tannineo/destack/build/server'
+import { ContentProvider } from '@tannineo/destack'
 
 const Index = (props) => {
   return (
